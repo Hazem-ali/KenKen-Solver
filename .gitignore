@@ -6,4 +6,5 @@ embed.py
 static
 __*__
 
-
+*.ipynb
+*.sh

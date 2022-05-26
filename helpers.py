@@ -24,7 +24,8 @@ def Cage_To_Cells(cage_positions: tuple, cage_values: tuple, color: tuple) -> li
     Convert one cage to a list of cells
     """
     cells = []
-    for i in range(cage_positions):
+
+    for i in range(len(cage_positions)):
         cell = (cage_positions[i], color, str(cage_values[i]))
         cells.append(cell)
 
