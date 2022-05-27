@@ -190,14 +190,22 @@ if __name__ == "__main__":
 
     laws_dict = helpers.Create_Law_Positions(laws_example)
 
-    board.setColors(helpers.Generate_Random_Colors(60))
+    board.setColors(helpers.Generate_Random_Colors(len(laws_dict)))
 
     board.law_dict = laws_dict
+    
+    # cells = helpers.Convert_Cages(solver)
+
+    # board.setData(cells)
+    board.display()
     
     cells = helpers.Convert_Cages(solver)
 
     board.setData(cells)
     board.display()
+
+
+
     # board.setData([
 
     #     # 4x4 board
