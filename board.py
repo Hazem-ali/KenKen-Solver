@@ -137,6 +137,7 @@ class Board:
     def display(self):
         pygame.quit()
         pygame.init()
+        pygame.display.set_caption("KenKen")
         self.screen = pygame.display.set_mode(
             (self.square_side, self.square_side))
         self.clock = pygame.time.Clock()
@@ -169,8 +170,6 @@ class Board:
 if __name__ == "__main__":
     board = Board(6, 80)
 
-    solver = eval('''{((1,1),(1,2)):(5,6),((3,1),(2,1)):(3,6),((3,2),(2,2)):(4,1),((4,1),(4,2)):(4,5),((6,1),(6,2),(6,3),(5,1)): (2,3,1,1),((5,3),(5,2)):(6,2),((2,3),(2,4),(1,3),(1,4)):(5,4,4,3),((3,3),(4,3)):(2,3),((5,4),(6,4)):(5,6),((2,5),(1,5)):(3,2),((3,4),(3,5)):(1,6),((4,4),(4,5),(5,5)):(2,1,4),((1,6),(2,6),(3,6)):(1,2,5),((4,6),(5,6)):(6,3),((6,6),(6,5)):(4,5)}''')
-
     laws_example = \
         "(((1, 1), (1, 2)), '+', 11)\n"\
         "(((2, 1), (3, 1)), '/', 2)\n"\
@@ -187,6 +186,12 @@ if __name__ == "__main__":
         "(((1, 6), (2, 6), (3, 6)), '+', 8)\n"\
         "(((4, 6), (5, 6)), '/', 2)\n"\
         "(((6, 5), (6, 6)), '+', 9)\n"
+    # laws_example is the random generated laws that we need to solve
+    # this (((6, 5), (6, 6)), '+', 9) we convert it into dict {((6, 5), (6, 6)): "9 +"} using Create_Law_Positions function
+
+    solver = eval('''{((1,1),(1,2)):(5,6),((3,1),(2,1)):(3,6),((3,2),(2,2)):(4,1),((4,1),(4,2)):(4,5),((6,1),(6,2),(6,3),(5,1)): (2,3,1,1),((5,3),(5,2)):(6,2),((2,3),(2,4),(1,3),(1,4)):(5,4,4,3),((3,3),(4,3)):(2,3),((5,4),(6,4)):(5,6),((2,5),(1,5)):(3,2),((3,4),(3,5)):(1,6),((4,4),(4,5),(5,5)):(2,1,4),((1,6),(2,6),(3,6)):(1,2,5),((4,6),(5,6)):(6,3),((6,6),(6,5)):(4,5)}''')
+    # solver is a dict that contains positions and their corresponding values
+
 
     laws_dict = helpers.Create_Law_Positions(laws_example)
 
@@ -194,14 +199,16 @@ if __name__ == "__main__":
 
     board.law_dict = laws_dict
     
-    # cells = helpers.Convert_Cages(solver)
 
-    # board.setData(cells)
+
+    # Display laws without values
     board.display()
     
-    cells = helpers.Convert_Cages(solver)
+    # Display laws with values
 
+    cells = helpers.Convert_Cages(solver)
     board.setData(cells)
+
     board.display()
 
 
