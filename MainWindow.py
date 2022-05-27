@@ -11,21 +11,23 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle as theme
 from board import Board
+import helpers
 
 # Theme Constants
 Light, Dark = "Light", "Dark"
 
 
-
+# TODO if you want constant color list for board, create random colors when generate button is clicked
 
 class Ui_MainWindow(object):
     def __init__(self) -> None:
-        self.color = Light
+        self.guiTheme = Light
+        self.colors = [] # generated colors for the board
 
         return
 
     def StatusBar_Message(self, color, message):
-        if self.color == Light:
+        if self.guiTheme == Light:
             self.statusBar.setStyleSheet("color : " + color)
         else:
             self.statusBar.setStyleSheet("color : white")
@@ -33,10 +35,22 @@ class Ui_MainWindow(object):
         return
 
     def GUI_Color(self, color):
-        self.color = color
+        self.guiTheme = color
         Change_Theme(color)
         self.StatusBar_Message("blue", color + " Mode Applied")
         return
+
+    def GenerateButtonHandler(self):
+        board_size = 3
+        self.colors = helpers.Generate_Random_Colors(board_size*board_size)
+        try:
+            board_size = int(self.BoardSizeInput.value())
+        except:
+            pass
+
+
+        return 
+
 
     def Generate_Board(self):
         # self.Board = Board(self.BoardSizeInput.value())
@@ -67,9 +81,9 @@ class Ui_MainWindow(object):
 
             # 3x3 board
             ((0, 0), (12, 0, 150), "X"),
-            ((1, 0), (150, 255, 150), '4'),
-            ((2, 0), (0, 18, 150), "7"),
-            ((3, 0), (158, 255, 12), "7"),
+            ((1, 0), (150, 255, 150), ''),
+            ((2, 0), (0, 18, 150), ""),
+            ((3, 0), (158, 255, 12), ""),
             ((0, 1), (255, 0, 150), "2"),
             ((1, 1), (0, 255, 150), "a"),
             ((2, 1), (0, 255, 150), "a"),
@@ -83,8 +97,10 @@ class Ui_MainWindow(object):
 
         ])
 
+
         self.Board.display()
-        return
+        return 
+
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -165,7 +181,7 @@ class Ui_MainWindow(object):
         self.BoardSizeInput.setMinimum(2)
         self.BoardSizeInput.setObjectName("BoardSizeInput")
         self.horizontalLayout_2.addWidget(self.BoardSizeInput)
-        self.GenerateButton = QtWidgets.QPushButton(self.frame_2)
+        self.GenerateButton = QtWidgets.QPushButton(self.frame_2,clicked=lambda: self.GenerateButtonHandler())
         self.GenerateButton.setMinimumSize(QtCore.QSize(100, 0))
         font = QtGui.QFont()
         font.setPointSize(9)
@@ -180,6 +196,12 @@ class Ui_MainWindow(object):
             40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem3)
         self.verticalLayout_2.addWidget(self.frame_2)
+
+
+
+
+
+
 
         self.frame = QtWidgets.QFrame(self.centralwidget)
         self.frame.setFrameShape(QtWidgets.QFrame.NoFrame)
