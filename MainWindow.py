@@ -41,15 +41,20 @@ class Ui_MainWindow(object):
         self.StatusBar_Message("blue", color + " Mode Applied")
         return
 
-    def GenerateButtonHandler(self):
-        board_size = 3
-        self.colors = helpers.Generate_Random_Colors(board_size*board_size)
+    def GenerateButtonHandler(
+        self: object,
+        nrows: int = 3) -> None:
+        """
+        Generate a new board with the given number of blocks
+
+        :param nrows: rows of the square board
+        :return: None
+        """
         try:
-            board_size = int(self.BoardSizeInput.value())
+            nrows = int(self.BoardSizeInput.value())
         except:
             pass
-        
-        self.Generate_Board(number_of_blocks=board_size)
+        self.Generate_Board(number_of_blocks=nrows)
 
     def Generate_Board(
         self: object,
@@ -76,7 +81,7 @@ class Ui_MainWindow(object):
             "(((4, 4), (4, 5), (5, 5)), '+', 7)\n"\
             "(((1, 6), (2, 6), (3, 6)), '+', 8)\n"\
             "(((4, 6), (5, 6)), '/', 2)\n"\
-            "(((6, 5), (6, 6)), '+', 9)\n"        
+            "(((6, 5), (6, 6)), '+', 9)\n"
         # * wrapper function to get cage values and cage cells
         laws = helpers.Create_Law_Positions(laws)
         # {((1, 1), (1, 2)): '11 +',...}
@@ -121,7 +126,34 @@ class Ui_MainWindow(object):
 
         # dsiplay
         self.Board.display()
-
+    
+    def SolveButtonHandler(
+        self: object) -> None:
+        # self.Generate_Board(number_of_blocks=board_size)
+        algo = ''
+        try:
+            # TODO: Error handling hazem
+            algo = str(self.AlgorithmComboBox.currentText())
+        except:
+            pass
+        # SOLVE THE BOARD
+        self.solveBoard(algo)
+        
+    def solveBoard(
+        self:object,
+        algo: str):
+        laws = self.Board.getLaws()
+        # solve from repo
+        solver = eval('''{((1,1),(1,2)):(5,6),((3,1),(2,1)):(3,6),((3,2),(2,2)):(4,1)\
+            ,((4,1),(4,2)):(4,5),((6,1),(6,2),(6,3),(5,1)): (2,3,1,1),((5,3),(5,2)):(6,2)\
+            ,((2,3),(2,4),(1,3),(1,4)):(5,4,4,3),((3,3),(4,3)):(2,3),((5,4),(6,4)):(5,6)\
+            ,((2,5),(1,5)):(3,2),((3,4),(3,5)):(1,6),((4,4),(4,5),(5,5)):(2,1,4),\
+            ((1,6),(2,6),(3,6)):(1,2,5),((4,6),(5,6)):(6,3),((6,6),(6,5)):(4,5)}''')
+        
+        # wrapper function to get cage values and cage cells
+        cells = helpers.Convert_Cages(solver)
+        self.Board.setData(cells)
+        self.Board.display()
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -257,7 +289,7 @@ class Ui_MainWindow(object):
         self.AlgorithmComboBox.addItem("")
         self.horizontalLayout.addWidget(self.AlgorithmComboBox)
         self.SolveButton = QtWidgets.QPushButton(
-            self.frame, clicked=lambda: self.Generate_Board())
+            self.frame, clicked=lambda: self.SolveButtonHandler())
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
