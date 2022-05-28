@@ -23,11 +23,11 @@ Light, Dark = "Light", "Dark"
 
 class Ui_MainWindow(object):
     def __init__(
-        self: object) -> None:
+            self: object) -> None:
         self.guiTheme = Light
-        self.Board : object = None
+        self.Board: object = None
         self.cellAssignments = None
-        self.colors = list() # generated colors for the board
+        self.colors = list()  # generated colors for the board
 
     def StatusBar_Message(self, color, message):
         if self.guiTheme == Light:
@@ -43,109 +43,133 @@ class Ui_MainWindow(object):
         self.StatusBar_Message("blue", color + " Mode Applied")
         return
 
+    def ErrorDialog(self, error_message):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Critical)
+        msg.setText('Error' + ' '*60)
+        msg.setInformativeText(error_message)
+        msg.setWindowTitle("Error")
+        msg.exec_()
+        return
+
+    def InfoDialog(self, message):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setText('Info' + ' '*60)
+        msg.setInformativeText(message)
+        msg.setWindowTitle("Info")
+        msg.exec_()
+        return
+
     def GenerateButtonHandler(
-        self: object,
-        nrows: int = 3) -> None:
+            self: object,
+            nrows: int = 3) -> None:
         """
         Generate a new board with the given number of blocks
 
         :param nrows: rows of the square board
         :return: None
         """
+
         try:
-            nrows = int(self.BoardSizeInput.value())
+            nrows = int(self.BoardSizeInput.text())
         except:
-            pass
-        self.Generate_Board(number_of_blocks=nrows)        
+            self.ErrorDialog("Please enter a valid board size")
+            return
+
+
+        self.Generate_Board(number_of_blocks=nrows)
 
     def Generate_Board(
-        self: object,
-        number_of_blocks: int = 3,
-        block_size: int=80):
+            self: object,
+            number_of_blocks: int = 3,
+            block_size: int = 80):
         # self.Board = Board(self.BoardSizeInput.value())
 
         _, cellAssignments = generate(number_of_blocks)
 
         self.Board = Board(number_of_blocks=number_of_blocks,
-            block_size=block_size)
+                           block_size=block_size)
         # genrate the board
-        # generate the laws from repo
-        laws= "\n".join(cel.__str__() for cel in cellAssignments)
+        # generate the laws for the board (m3rof y3ny)
+        # laws = "\n".join(cel.__str__() for cel in cellAssignments)
 
         # * wrapper function to get cage values and cage cells
-        laws = helpers.Create_Law_Positions(laws)
+        # laws = helpers.Create_Law_Positions(laws)
         # {((1, 1), (1, 2)): '11 +',...}
 
-        self.Board.setColors(helpers.Generate_Random_Colors(len(laws)))
+        # self.Board.setColors(helpers.Generate_Random_Colors(len(laws)))
 
-        self.Board.setLaws(laws)
+        # self.Board.setLaws(laws)
         # self.Board.setData([
-            # 4x4 board
+        # 4x4 board
 
-            # ((0, 0), (0, 255, 150), "1"),
-            # ((1, 0), (150, 255, 150), "4"),
-            # ((2, 0), (0, 18, 150), "7"),
-            # ((3, 0), (158, 255, 12), "7"),
-            # ((0, 1), (255, 0, 150), "2"),
-            # ((1, 1), (0, 255, 150), "M"),
-            # ((2, 1), (0, 255, 150), "O"),
-            # ((3, 1), (0, 255, 150), "O"),
-            # ((0, 2), (0, 255, 150), "F"),
-            # ((1, 2), (255, 255, 150), "T"),
-            # ((2, 2), (0, 255, 150), "Y"),
-            # ((3, 2), (0, 255, 150), "Y"),
-            # ((0, 3), (0, 255, 150), "K"),
-            # ((1, 3), (0, 255, 150), "N"),
-            # ((2, 3), (0, 255, 150), "K"),
-            # ((3, 3), (0, 255, 0), "N"),
+        # ((0, 0), (0, 255, 150), "1"),
+        # ((1, 0), (150, 255, 150), "4"),
+        # ((2, 0), (0, 18, 150), "7"),
+        # ((3, 0), (158, 255, 12), "7"),
+        # ((0, 1), (255, 0, 150), "2"),
+        # ((1, 1), (0, 255, 150), "M"),
+        # ((2, 1), (0, 255, 150), "O"),
+        # ((3, 1), (0, 255, 150), "O"),
+        # ((0, 2), (0, 255, 150), "F"),
+        # ((1, 2), (255, 255, 150), "T"),
+        # ((2, 2), (0, 255, 150), "Y"),
+        # ((3, 2), (0, 255, 150), "Y"),
+        # ((0, 3), (0, 255, 150), "K"),
+        # ((1, 3), (0, 255, 150), "N"),
+        # ((2, 3), (0, 255, 150), "K"),
+        # ((3, 3), (0, 255, 0), "N"),
 
-            # 3x3 board
-            # ((0, 0), (12, 0, 150), "X"),
-            # ((1, 0), (150, 255, 150), ''),
-            # ((2, 0), (0, 18, 150), ""),
-            # ((3, 0), (158, 255, 12), ""),
-            # ((0, 1), (255, 0, 150), "2"),
-            # ((1, 1), (0, 255, 150), "a"),
-            # ((2, 1), (0, 255, 150), "a"),
-            # ((3, 1), (0, 255, 150), "O"),
-            # ((0, 2), (0, 255, 150), "F"),
-            # ((1, 2), (255, 255, 150), "T"),
-            # ((2, 2), (0, 255, 150), "2"),
-            # ((3, 2), (0, 255, 150), "q"),
+        # 3x3 board
+        # ((0, 0), (12, 0, 150), "X"),
+        # ((1, 0), (150, 255, 150), ''),
+        # ((2, 0), (0, 18, 150), ""),
+        # ((3, 0), (158, 255, 12), ""),
+        # ((0, 1), (255, 0, 150), "2"),
+        # ((1, 1), (0, 255, 150), "a"),
+        # ((2, 1), (0, 255, 150), "a"),
+        # ((3, 1), (0, 255, 150), "O"),
+        # ((0, 2), (0, 255, 150), "F"),
+        # ((1, 2), (255, 255, 150), "T"),
+        # ((2, 2), (0, 255, 150), "2"),
+        # ((3, 2), (0, 255, 150), "q"),
         # ])
 
-        self.cellAssignments = cellAssignments
+        # self.cellAssignments = cellAssignments
         # dsiplay
-        self.Board.display()
-    
+        # self.Board.display()
+
     def SolveButtonHandler(
-        self: object) -> None:
+            self: object) -> None:
         # self.Generate_Board(number_of_blocks=board_size)
         algo = ''
-        try:
-            # TODO: Error handling hazem
-            algo = str(self.AlgorithmComboBox.currentText())
-        except:
-            pass
+        algorithms = ["Backtracking", "Forward Checking", "Arc Consistency"]
+
+        algo = self.AlgorithmComboBox.currentText()
+        if algo not in algorithms:
+            self.ErrorDialog("Please select an algorithm to solve the puzzle")
+            return
+
         # SOLVE THE BOARD
         self.solveBoard(algo)
-        
+
     def solveBoard(
-        self:object,
-        algo: str):
+            self: object,
+            algo: str):
         # laws = self.Board.getLaws()
         # solve from repo
         size = self.Board.number_of_blocks
-        solver = solve(size=size, cellAssignments=self.cellAssignments, algorithm=algo)
-        
+        solver = solve(
+            size=size, cellAssignments=self.cellAssignments, algorithm=algo)
+
         # solver = eval('''{((1,1),(1,2)):(5,6),((3,1),(2,1)):(3,6),((3,2),(2,2)):(4,1)\
         #     ,((4,1),(4,2)):(4,5),((6,1),(6,2),(6,3),(5,1)): (2,3,1,1),((5,3),(5,2)):(6,2)\
         #     ,((2,3),(2,4),(1,3),(1,4)):(5,4,4,3),((3,3),(4,3)):(2,3),((5,4),(6,4)):(5,6)\
         #     ,((2,5),(1,5)):(3,2),((3,4),(3,5)):(1,6),((4,4),(4,5),(5,5)):(2,1,4),\
         #     ((1,6),(2,6),(3,6)):(1,2,5),((4,6),(5,6)):(6,3),((6,6),(6,5)):(4,5)}''')
-        
+
         # wrapper function to get cage values and cage cells
-        # cells = helpers.Convert_Cages(solver)
         cells = helpers.Convert_Cages(solver)
         self.Board.setData(cells)
         self.Board.display()
@@ -226,10 +250,11 @@ class Ui_MainWindow(object):
         font.setWeight(50)
         font.setStrikeOut(False)
         self.BoardSizeInput.setFont(font)
-        self.BoardSizeInput.setMinimum(2)
+        self.BoardSizeInput.setMinimum(1)
         self.BoardSizeInput.setObjectName("BoardSizeInput")
         self.horizontalLayout_2.addWidget(self.BoardSizeInput)
-        self.GenerateButton = QtWidgets.QPushButton(self.frame_2,clicked=lambda: self.GenerateButtonHandler())
+        self.GenerateButton = QtWidgets.QPushButton(
+            self.frame_2, clicked=lambda: self.GenerateButtonHandler())
         self.GenerateButton.setMinimumSize(QtCore.QSize(100, 0))
         font = QtGui.QFont()
         font.setPointSize(9)
@@ -244,12 +269,6 @@ class Ui_MainWindow(object):
             40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem3)
         self.verticalLayout_2.addWidget(self.frame_2)
-
-
-
-
-
-
 
         self.frame = QtWidgets.QFrame(self.centralwidget)
         self.frame.setFrameShape(QtWidgets.QFrame.NoFrame)
