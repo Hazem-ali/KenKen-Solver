@@ -14,6 +14,7 @@ import qdarkstyle as theme
 from board import Board
 import helpers
 
+from kenken import generate
 # Theme Constants
 Light, Dark = "Light", "Dark"
 
@@ -54,7 +55,7 @@ class Ui_MainWindow(object):
             nrows = int(self.BoardSizeInput.value())
         except:
             pass
-        self.Generate_Board(number_of_blocks=nrows)
+        self.Generate_Board(number_of_blocks=nrows)        
 
     def Generate_Board(
         self: object,
@@ -62,26 +63,14 @@ class Ui_MainWindow(object):
         block_size: int=80):
         # self.Board = Board(self.BoardSizeInput.value())
 
+        _, cellAssignments = generate(number_of_blocks)
+
         self.Board = Board(number_of_blocks=number_of_blocks,
             block_size=block_size)
         # genrate the board
         # generate the laws from repo
-        laws = \
-            "(((1, 1), (1, 2)), '+', 11)\n"\
-            "(((2, 1), (3, 1)), '/', 2)\n"\
-            "(((2, 2), (3, 2)), '-', 3)\n"\
-            "(((4, 1), (4, 2)), '*', 20)\n"\
-            "(((5, 1), (6, 1), (6, 2), (6, 3)), '*', 6)\n"\
-            "(((5, 2), (5, 3)), '/', 3)\n"\
-            "(((1, 3), (1, 4), (2, 3), (2, 4)), '*', 240)\n"\
-            "(((3, 3), (4, 3)), '*', 6)\n"\
-            "(((5, 4), (6, 4)), '*', 30)\n"\
-            "(((1, 5), (2, 5)), '*', 6)\n"\
-            "(((3, 4), (3, 5)), '*', 6)\n"\
-            "(((4, 4), (4, 5), (5, 5)), '+', 7)\n"\
-            "(((1, 6), (2, 6), (3, 6)), '+', 8)\n"\
-            "(((4, 6), (5, 6)), '/', 2)\n"\
-            "(((6, 5), (6, 6)), '+', 9)\n"
+        laws= "\n".join(cel.__str__() for cel in cellAssignments)
+
         # * wrapper function to get cage values and cage cells
         laws = helpers.Create_Law_Positions(laws)
         # {((1, 1), (1, 2)): '11 +',...}
