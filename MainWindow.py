@@ -14,7 +14,7 @@ import qdarkstyle as theme
 from board import Board
 import helpers
 
-from kenken import generate
+from kenken import generate, solve
 # Theme Constants
 Light, Dark = "Light", "Dark"
 
@@ -26,6 +26,7 @@ class Ui_MainWindow(object):
         self: object) -> None:
         self.guiTheme = Light
         self.Board : object = None
+        self.cellAssignments = None
         self.colors = list() # generated colors for the board
 
     def StatusBar_Message(self, color, message):
@@ -113,6 +114,7 @@ class Ui_MainWindow(object):
             # ((3, 2), (0, 255, 150), "q"),
         # ])
 
+        self.cellAssignments = cellAssignments
         # dsiplay
         self.Board.display()
     
@@ -131,15 +133,19 @@ class Ui_MainWindow(object):
     def solveBoard(
         self:object,
         algo: str):
-        laws = self.Board.getLaws()
+        # laws = self.Board.getLaws()
         # solve from repo
-        solver = eval('''{((1,1),(1,2)):(5,6),((3,1),(2,1)):(3,6),((3,2),(2,2)):(4,1)\
-            ,((4,1),(4,2)):(4,5),((6,1),(6,2),(6,3),(5,1)): (2,3,1,1),((5,3),(5,2)):(6,2)\
-            ,((2,3),(2,4),(1,3),(1,4)):(5,4,4,3),((3,3),(4,3)):(2,3),((5,4),(6,4)):(5,6)\
-            ,((2,5),(1,5)):(3,2),((3,4),(3,5)):(1,6),((4,4),(4,5),(5,5)):(2,1,4),\
-            ((1,6),(2,6),(3,6)):(1,2,5),((4,6),(5,6)):(6,3),((6,6),(6,5)):(4,5)}''')
+        size = self.Board.number_of_blocks
+        solver = solve(size=size, cellAssignments=self.cellAssignments, algorithm=algo)
+        
+        # solver = eval('''{((1,1),(1,2)):(5,6),((3,1),(2,1)):(3,6),((3,2),(2,2)):(4,1)\
+        #     ,((4,1),(4,2)):(4,5),((6,1),(6,2),(6,3),(5,1)): (2,3,1,1),((5,3),(5,2)):(6,2)\
+        #     ,((2,3),(2,4),(1,3),(1,4)):(5,4,4,3),((3,3),(4,3)):(2,3),((5,4),(6,4)):(5,6)\
+        #     ,((2,5),(1,5)):(3,2),((3,4),(3,5)):(1,6),((4,4),(4,5),(5,5)):(2,1,4),\
+        #     ((1,6),(2,6),(3,6)):(1,2,5),((4,6),(5,6)):(6,3),((6,6),(6,5)):(4,5)}''')
         
         # wrapper function to get cage values and cage cells
+        # cells = helpers.Convert_Cages(solver)
         cells = helpers.Convert_Cages(solver)
         self.Board.setData(cells)
         self.Board.display()
