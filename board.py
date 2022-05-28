@@ -4,14 +4,17 @@ import pygame
 import helpers
 
 COLORTYPE: type = Tuple[float, float, float]
+
+
 class Board:
     """
         KenKen Board
     """
+
     def __init__(
-        self: object,
-        number_of_blocks: int,
-        block_size: Optional[int]=50):
+            self: object,
+            number_of_blocks: int,
+            block_size: Optional[int] = 50):
         """
             Initializes the board.
             :param number_of_blocks (int): The number of blocks in the board.
@@ -46,12 +49,7 @@ class Board:
         self.data_list = data
 
     def getData(
-        self: object) \
-            -> List[
-                Tuple[
-                    Tuple[int, int],
-                    COLORTYPE,
-                    str]]:
+            self: object) -> List[Tuple[Tuple[int, int], COLORTYPE, str]]:
         """
             Returns the data of the board.
             :return: The data of the board.
@@ -59,8 +57,8 @@ class Board:
         return self.data_list
 
     def setColors(
-        self:object,
-        colors: List[COLORTYPE]):
+            self: object,
+            colors: List[COLORTYPE]):
         """
             Sets the colors for each cage on the board.
             colors is list of tuple, each tuple is (r, g, b)
@@ -68,17 +66,15 @@ class Board:
         self.colors = colors
         return
 
-    def getColors(
-        self: object)\
-            -> List[COLORTYPE]:
+    def getColors(self: object) -> List[COLORTYPE]:
         """
             Returns the colors of the cages.
         """
         return self.colors
 
     def setLaws(
-        self: object,
-        laws: Dict[Tuple[Tuple[int, int]], str]):
+            self: object,
+            laws: Dict[Tuple[Tuple[int, int]], str]):
         """
             Sets the laws for each cage on the board.
             laws is a dictionary of tuples, each tuple is (x, y, value)
@@ -94,9 +90,9 @@ class Board:
         return self.law_dict
 
     def paint_color_only(
-        self: object,
-        coordinates: Tuple[int, int],
-        color: COLORTYPE) -> None:
+            self: object,
+            coordinates: Tuple[int, int],
+            color: COLORTYPE) -> None:
         """
             Paints a square with a given color.
             :param coordinates: The coordinates of the square.
@@ -111,8 +107,6 @@ class Board:
                 self.block_size,
                 self.block_size))
 
-
-
         # x, y are the coordinates of the rectangle: starts at the top left corner (0, 0)
         # x is the row number, y is the column number
         # y, x = coordinates[0] - 1, coordinates[1] - 1
@@ -124,7 +118,7 @@ class Board:
         # pygame.draw.rect(self.screen, color, rect)
 
     def drawGrid(
-        self: object):
+            self: object):
         """
             Draws the grid on the screen.
         """
@@ -134,25 +128,29 @@ class Board:
 
         # draw text
         if self.data_list:
-            if len(self.data_list[0])==3:
+            if len(self.data_list[0]) == 3:
                 for coordinates, text_color, value in self.data_list:
+                    y, x = coordinates[0] - 1, coordinates[1] - 1
+                    Y, X = y * self.block_size, x * self.block_size
+
                     self.addText(
                         text=value,
-                        size=15,
+                        size=30,
                         text_color=text_color,
-                        coordinates= (
-                            (coordinates[0] -1) * self.block_size + self.block_size // 2,
-                            (coordinates[1] -1) * self.block_size + self.block_size // 2)
-                            )
+                        coordinates=(Y + self.block_size / 2,
+                                     X + self.block_size / 2)
+                    )
             else:
-                for coordinates,_, value in self.data_list:
+                for coordinates, value in self.data_list:
+                    y, x = coordinates[0] - 1, coordinates[1] - 1
+                    Y, X = y * self.block_size, x * self.block_size
+
                     self.addText(
                         text=value,
-                        size=15,
-                        coordinates= (
-                            (coordinates[0] -1) * self.block_size + self.block_size // 2,
-                            (coordinates[1] -1) * self.block_size + self.block_size // 2)
-                            )
+                        size=30,
+                        coordinates=(Y + self.block_size / 2,
+                                     X + self.block_size / 2)
+                    )
 
                 # x, y are the coordinates of the rectangle: starts at the top left corner (0, 0)
                 # x is the row number, y is the column number
@@ -164,7 +162,7 @@ class Board:
                 #              coordinates=(Y + self.block_size / 2, X + self.block_size / 2))
 
     def drawLaws(
-        self: object):
+            self: object):
         """
             Draws the laws on the screen.
         """
@@ -214,11 +212,11 @@ class Board:
     #     self.addText(corner_law, 15, (Y + 10, X+10))
 
     def addText(
-        self:object,
-        text: str,
-        size: int,
-        coordinates: Tuple[int, int],
-        text_color: COLORTYPE = (0, 0, 0)):
+            self: object,
+            text: str,
+            size: int,
+            coordinates: Tuple[int, int],
+            text_color: COLORTYPE = (0, 0, 0)):
         """
             Adds text to the screen.
             :param text: The text to be displayed.
@@ -234,7 +232,7 @@ class Board:
         self.screen.blit(text_widget, text_widget_rect)
 
     def display(
-        self: object):
+            self: object):
 
         pygame.quit()
         pygame.init()
