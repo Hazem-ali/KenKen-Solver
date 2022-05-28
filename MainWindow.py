@@ -49,26 +49,42 @@ class Ui_MainWindow(object):
         except:
             pass
         
-        # genrate the board
         self.Generate_Board(number_of_blocks=board_size)
-        # print(board_size)
-
-        return 
-
 
     def Generate_Board(
         self: object,
         number_of_blocks: int = 3,
-        block_size: int=80,
-        data: list = None):
+        block_size: int=80):
         # self.Board = Board(self.BoardSizeInput.value())
 
-        
         self.Board = Board(number_of_blocks=number_of_blocks,
             block_size=block_size)
+        # genrate the board
+        # generate the laws from repo
+        laws = \
+            "(((1, 1), (1, 2)), '+', 11)\n"\
+            "(((2, 1), (3, 1)), '/', 2)\n"\
+            "(((2, 2), (3, 2)), '-', 3)\n"\
+            "(((4, 1), (4, 2)), '*', 20)\n"\
+            "(((5, 1), (6, 1), (6, 2), (6, 3)), '*', 6)\n"\
+            "(((5, 2), (5, 3)), '/', 3)\n"\
+            "(((1, 3), (1, 4), (2, 3), (2, 4)), '*', 240)\n"\
+            "(((3, 3), (4, 3)), '*', 6)\n"\
+            "(((5, 4), (6, 4)), '*', 30)\n"\
+            "(((1, 5), (2, 5)), '*', 6)\n"\
+            "(((3, 4), (3, 5)), '*', 6)\n"\
+            "(((4, 4), (4, 5), (5, 5)), '+', 7)\n"\
+            "(((1, 6), (2, 6), (3, 6)), '+', 8)\n"\
+            "(((4, 6), (5, 6)), '/', 2)\n"\
+            "(((6, 5), (6, 6)), '+', 9)\n"        
+        # * wrapper function to get cage values and cage cells
+        laws = helpers.Create_Law_Positions(laws)
+        # {((1, 1), (1, 2)): '11 +',...}
 
-        self.Board.setData([
+        self.Board.setColors(helpers.Generate_Random_Colors(len(laws)))
 
+        self.Board.setLaws(laws)
+        # self.Board.setData([
             # 4x4 board
 
             # ((0, 0), (0, 255, 150), "1"),
@@ -89,24 +105,21 @@ class Ui_MainWindow(object):
             # ((3, 3), (0, 255, 0), "N"),
 
             # 3x3 board
-            ((0, 0), (12, 0, 150), "X"),
-            ((1, 0), (150, 255, 150), ''),
-            ((2, 0), (0, 18, 150), ""),
-            ((3, 0), (158, 255, 12), ""),
-            ((0, 1), (255, 0, 150), "2"),
-            ((1, 1), (0, 255, 150), "a"),
-            ((2, 1), (0, 255, 150), "a"),
-            ((3, 1), (0, 255, 150), "O"),
-            ((0, 2), (0, 255, 150), "F"),
-            ((1, 2), (255, 255, 150), "T"),
-            ((2, 2), (0, 255, 150), "2"),
-            ((3, 2), (0, 255, 150), "q"),
+            # ((0, 0), (12, 0, 150), "X"),
+            # ((1, 0), (150, 255, 150), ''),
+            # ((2, 0), (0, 18, 150), ""),
+            # ((3, 0), (158, 255, 12), ""),
+            # ((0, 1), (255, 0, 150), "2"),
+            # ((1, 1), (0, 255, 150), "a"),
+            # ((2, 1), (0, 255, 150), "a"),
+            # ((3, 1), (0, 255, 150), "O"),
+            # ((0, 2), (0, 255, 150), "F"),
+            # ((1, 2), (255, 255, 150), "T"),
+            # ((2, 2), (0, 255, 150), "2"),
+            # ((3, 2), (0, 255, 150), "q"),
+        # ])
 
-
-
-        ])
-
-
+        # dsiplay
         self.Board.display()
 
 
