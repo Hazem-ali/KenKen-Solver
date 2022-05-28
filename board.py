@@ -3,7 +3,7 @@ from typing import List, Tuple, Optional, Dict
 import pygame
 import helpers
 
-COLORTYPE = Tuple[float, float, float]
+COLORTYPE: type = Tuple[float, float, float]
 class Board:
     """
         KenKen Board
@@ -134,14 +134,25 @@ class Board:
 
         # draw text
         if self.data_list:
-            for coordinates, value in self.data_list:
-                self.addText(
-                    text=value,
-                    size=15,
-                    coordinates= (
-                        (coordinates[0] -1) * self.block_size + self.block_size // 2,
-                        (coordinates[1] -1) * self.block_size + self.block_size // 2)
-                        )
+            if len(self.data_list[0])==3:
+                for coordinates, text_color, value in self.data_list:
+                    self.addText(
+                        text=value,
+                        size=15,
+                        text_color=text_color,
+                        coordinates= (
+                            (coordinates[0] -1) * self.block_size + self.block_size // 2,
+                            (coordinates[1] -1) * self.block_size + self.block_size // 2)
+                            )
+            else:
+                for coordinates,_, value in self.data_list:
+                    self.addText(
+                        text=value,
+                        size=15,
+                        coordinates= (
+                            (coordinates[0] -1) * self.block_size + self.block_size // 2,
+                            (coordinates[1] -1) * self.block_size + self.block_size // 2)
+                            )
 
                 # x, y are the coordinates of the rectangle: starts at the top left corner (0, 0)
                 # x is the row number, y is the column number
