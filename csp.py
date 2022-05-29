@@ -319,7 +319,21 @@ def unordered_domain_values(var, constrain_search_problem_var):
     return Choices_Of_Variable
 
 
-
+# Hossam #
+def forward_checking(constrain_search_problem_var, var_value, value, assignment, removals):
+    """Prune neighbor values inconsistent with var=value."""
+    constrain_search_problem_var.support_pruning()
+    i = 0
+    while i != len(constrain_search_problem_var.neighbors[var_value]):
+        currentVal = constrain_search_problem_var.neighbors[var_value][i]
+        if currentVal not in assignment:
+            for b in constrain_search_problem_var.curr_domains[currentVal][:]:
+                if not constrain_search_problem_var.constraints(var_value, value, currentVal, b):
+                    constrain_search_problem_var.prune(currentVal, b, removals)
+            if not constrain_search_problem_var.curr_domains[currentVal]:
+                return False
+        i = i + 1
+    return True
 
 
 
