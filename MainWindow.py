@@ -12,9 +12,9 @@ from typing import List, Tuple, Optional, Dict
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle as theme
 from board import Board
+from kenken import generate, solve
 import helpers
 
-from kenken import generate, solve
 # Theme Constants
 Light, Dark = "Light", "Dark"
 
@@ -92,15 +92,15 @@ class Ui_MainWindow(object):
                            block_size=block_size)
         # genrate the board
         # generate the laws for the board (m3rof y3ny)
-        # laws = "\n".join(cel.__str__() for cel in cellAssignments)
+        laws = "\n".join(cel.__str__() for cel in cellAssignments)
 
         # * wrapper function to get cage values and cage cells
-        # laws = helpers.Create_Law_Positions(laws)
+        laws = helpers.Create_Law_Positions(laws)
         # {((1, 1), (1, 2)): '11 +',...}
 
-        # self.Board.setColors(helpers.Generate_Random_Colors(len(laws)))
+        self.Board.setColors(helpers.Generate_Random_Colors(len(laws)))
 
-        # self.Board.setLaws(laws)
+        self.Board.setLaws(laws)
         # self.Board.setData([
         # 4x4 board
 
@@ -136,9 +136,9 @@ class Ui_MainWindow(object):
         # ((3, 2), (0, 255, 150), "q"),
         # ])
 
-        # self.cellAssignments = cellAssignments
+        self.cellAssignments = cellAssignments
         # dsiplay
-        # self.Board.display()
+        self.Board.display()
 
     def SolveButtonHandler(
             self: object) -> None:
@@ -147,8 +147,14 @@ class Ui_MainWindow(object):
         algorithms = ["Backtracking", "Forward Checking", "Arc Consistency"]
 
         algo = self.AlgorithmComboBox.currentText()
+
+        # Error handling: invalid algorithm
         if algo not in algorithms:
             self.ErrorDialog("Please select an algorithm to solve the puzzle")
+            return
+        # Error handling: no board generated
+        if self.cellAssignments is None:
+            self.ErrorDialog("Please generate a board first")
             return
 
         # SOLVE THE BOARD
