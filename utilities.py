@@ -22,7 +22,9 @@ def first(iterable, default=None):
 
 
 def is_in(elt, seq):
-    """Similar to (elt in seq), but compares with 'is', not '=='."""
+    """
+        Return True if elt is in seq.
+    """
     return any(x is elt for x in seq)
 
 
