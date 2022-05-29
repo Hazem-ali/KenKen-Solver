@@ -1,5 +1,6 @@
 """search.py"""
 from typing import List, Optional, Tuple, Dict
+import collections.abc
 from utilities import is_in
 
 

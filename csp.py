@@ -193,7 +193,7 @@ class CSP(problem.Problem):
         self.curr_domains[var].remove(value)
         if removals is not None:
             removals.append((var, value))
-    def assignVal(self, var, value):
+    def suppose(self, var, value):
         # Start accumulating inferences from assuming var=value
         """
         params: var: a variable
@@ -311,11 +311,11 @@ def num_legal_values(constrain_search_problem_var, variable, assignment):
 # Value ordering
 
 
-def unordered_domain_values(var, constrain_search_problem_var):
+def unordered_domain_values(var, assignment, constrain_search_problem_var):
     """ here we get the unordered domain values of the cells """
     # this is important for the CSP search
 
-    Choices_Of_Variable = constrain_search_problem_var.choices(var) 
+    Choices_Of_Variable = constrain_search_problem_var.choices(var)
     return Choices_Of_Variable
 
 def dummy_infer(*args): return True
@@ -353,7 +353,7 @@ def backtracking_search(constrain_search_problem_var,
         if len(assignment) == len(constrain_search_problem_var.variables):
             return assignment
         var = chooseUnassignedVar(assignment, constrain_search_problem_var)
-        for value in domainOrder(var, constrain_search_problem_var):
+        for value in domainOrder(var, assignment, constrain_search_problem_var):
             if 0 == constrain_search_problem_var.nconflicts(var, value, assignment):
                 constrain_search_problem_var.assign(var, value, assignment)
                 removals = constrain_search_problem_var.suppose(var, value)
