@@ -210,3 +210,77 @@ def removeInconsistentValues(csp_var, Xi, Xj, removals):
     return removedVal
 
 # -------------------------------------------------------------------------------------
+
+
+def first_unassigned_variable(assignment, constrain_search_problem_var):
+    # this is important for the backtracking search because it gets the first unassigned variable to start with
+    # here we get the unassigned cells in cages
+    return first([unassignedVariable for unassignedVariable in constrain_search_problem_var.variables if unassignedVariable not in assignment])
+
+
+def mrv(assignment, constrain_search_problem_var):
+    """Minimum-remaining-values heuristic."""
+    return argmin_random_tie(
+        [v for v in constrain_search_problem_var.variables if v not in assignment],
+        key=lambda var: num_legal_values(constrain_search_problem_var, var, assignment))
+
+
+def num_legal_values(constrain_search_problem_var, variable, assignment):
+    """The number of legal values for a variable."""
+    """
+    params:
+        constrain_search_problem_var: the problem
+        variable: the variable
+        assignment: the assignment
+
+
+    """
+    # this is the number of legal values for a variable in a cage
+    # important because we want to find the most constrained variable in a further step
+
+
+
+    # Logic here is that if the variable is assigned, then it's the only legal value
+    if constrain_search_problem_var.curr_domains:
+        return len(constrain_search_problem_var.curr_domains[variable])
+    else:
+        return count(constrain_search_problem_var.nconflicts(variable, val, assignment) == 0
+                     for val in constrain_search_problem_var.domains[variable])
+
+# Value ordering
+
+
+def unordered_domain_values(var, constrain_search_problem_var):
+    """ here we get the unordered domain values of the cells """
+    # this is important for the CSP search
+
+    Choices_Of_Variable = constrain_search_problem_var.choices(var) 
+    return Choices_Of_Variable
+
+
+
+
+
+
+
+def setupFunction():
+    # Here we create the problem
+    # Credits by the author of this function:
+    # el gondy el mag'hoool Mofty
+    csp_time_variant_lol = []
+    x = 0
+    y = 0
+    lol = "LOL"
+    for i in range(2500):
+        csp_time_variant_lol.append(i)
+
+    Basic_Dict = {}
+    for i in range(2500):
+        Basic_Dict[i] = csp_time_variant_lol 
+        for j in range(2500):
+            Basic_Dict[i].append(0)
+
+    return 
+
+
+
