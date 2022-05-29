@@ -341,6 +341,32 @@ def mac(constrain_search_problem_var, var, value, assignment, removals):
     """Maintain arc consistency."""
     return AC3(constrain_search_problem_var, [(X, var) for X in constrain_search_problem_var.neighbors[var]], removals)
 
+# The search, proper
+
+# Hossam #
+def backtracking_search(constrain_search_problem_var,
+                        chooseUnassignedVar=first_unassigned_variable,
+                        domainOrder=unordered_domain_values,
+                        inference=dummy_infer):
+    def makeVackTrackFunction(assignment):
+        if len(assignment) == len(constrain_search_problem_var.variables):
+            return assignment
+        var = chooseUnassignedVar(assignment, constrain_search_problem_var)
+        for value in domainOrder(var, constrain_search_problem_var):
+            if 0 == constrain_search_problem_var.nconflicts(var, value, assignment):
+                constrain_search_problem_var.assign(var, value, assignment)
+                removals = constrain_search_problem_var.suppose(var, value)
+                if inference(constrain_search_problem_var, var, value, assignment, removals):
+                    result = makeVackTrackFunction(assignment)
+                    if result is not None:
+                        return result
+                constrain_search_problem_var.restore(removals)
+        constrain_search_problem_var.unassign(var, assignment)
+        return None
+
+    result = makeVackTrackFunction({})
+    assert result is None or constrain_search_problem_var.goal_test(result)
+    return result
 
 
 
