@@ -22,10 +22,11 @@ ALGORITHMS: Set = {"Backtracking", "Forward Checking", "Arc Consistency"}
 
 # TODO if you want constant color list for board, create random colors when generate button is clicked
 
+
 class Ui_MainWindow(object):
     def __init__(
             self: object) -> None:
-        self.guiTheme = Light
+        self.guiTheme = Dark
         self.Board: object = None
         self.cellAssignments = None
         self.colors = list()  # generated colors for the board
@@ -33,12 +34,13 @@ class Ui_MainWindow(object):
     def StatusBar_Message(
             self: object,
             color: str,
-            message: str):
+            message: str,
+            timeout: int = 5000) -> None:
         if self.guiTheme == Light:
             self.statusBar.setStyleSheet("color : " + color)
         else:
             self.statusBar.setStyleSheet("color : white")
-        self.statusBar.showMessage(message, 5000)
+        self.statusBar.showMessage(message, timeout)
 
     def GUI_Color(
             self: object,
@@ -48,7 +50,7 @@ class Ui_MainWindow(object):
         self.StatusBar_Message("blue", color + " Mode Applied")
 
     def ErrorDialog(
-            self:str,
+            self: str,
             error_message: str):
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Critical)
@@ -75,13 +77,17 @@ class Ui_MainWindow(object):
                 the genetrator
         :param nrows: rows of the square board
         """
+        # Error handling: invalid number of rows
         try:
             nrows = int(self.BoardSizeInput.text())
         except ValueError:
             self.ErrorDialog("Please enter a valid board size")
             return
 
+        self.StatusBar_Message("green", "Board Generated Successfully...", 10000)
         self.Generate_Board(nrows=nrows)
+        # Status bar
+        return
 
     def Generate_Board(
             self: object,
@@ -165,6 +171,7 @@ class Ui_MainWindow(object):
             return
 
         # SOLVE THE BOARD
+        self.StatusBar_Message("green", "Solving...", 50000)
         self.solveBoard(algo)
 
     def solveBoard(
@@ -181,6 +188,7 @@ class Ui_MainWindow(object):
         # laws = self.Board.getLaws()
         # solve from repo
         size = self.Board.number_of_blocks
+        # status bar please wait
         solver = solve(
             size=size,
             cellAssignments=self.cellAssignments,
@@ -193,13 +201,14 @@ class Ui_MainWindow(object):
         #     ((1,6),(2,6),(3,6)):(1,2,5),((4,6),(5,6)):(6,3),((6,6),(6,5)):(4,5)}''')
 
         # wrapper function to get cage values and cage cells
+        self.StatusBar_Message("green", "Solved Successfully...", 10000)
         cells = helpers.Convert_Cages(solver)
         self.Board.setData(cells)
         self.Board.display()
 
     def setupUi(
-        self: object,
-        MainWindow: QtWidgets.QMainWindow):
+            self: object,
+            MainWindow: QtWidgets.QMainWindow):
         """
             Main GUI functions and handles
         """
@@ -223,7 +232,7 @@ class Ui_MainWindow(object):
         MainWindow.setAcceptDrops(False)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(
-            "d:\\Hazem\\Coding\\KenKen GUI\\Ui Files\\../static/moftyIcon.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            "./static/moftyIcon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -381,6 +390,7 @@ class Ui_MainWindow(object):
         self.actionSave_As.setObjectName("actionSave_As")
         self.actionClose = QtWidgets.QAction(MainWindow)
         self.actionClose.setObjectName("actionClose")
+        self.actionClose.triggered.connect(lambda: exit())
         self.actionLight = QtWidgets.QAction(MainWindow)
         self.actionLight.setCheckable(False)
         self.actionLight.setChecked(False)
@@ -446,7 +456,7 @@ class Ui_MainWindow(object):
 
 
 def Change_Theme(
-    color: str):
+        color: str):
     """
     Changes the theme of the GUI to the given color.
 
