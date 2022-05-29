@@ -318,6 +318,7 @@ def unordered_domain_values(var, constrain_search_problem_var):
     Choices_Of_Variable = constrain_search_problem_var.choices(var) 
     return Choices_Of_Variable
 
+def dummy_infer(*args): return True
 
 # Hossam #
 def forward_checking(constrain_search_problem_var, var_value, value, assignment, removals):
