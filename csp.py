@@ -336,6 +336,12 @@ def forward_checking(constrain_search_problem_var, var_value, value, assignment,
     return True
 
 
+# Hossam #
+def mac(constrain_search_problem_var, var, value, assignment, removals):
+    """Maintain arc consistency."""
+    return AC3(constrain_search_problem_var, [(X, var) for X in constrain_search_problem_var.neighbors[var]], removals)
+
+
 
 
 def setupFunction():
