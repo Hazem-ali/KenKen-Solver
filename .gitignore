@@ -3,7 +3,6 @@ Ui Files
 # python
 old_gui.py
 embed.py
-static
 __*__
 
 *.ipynb

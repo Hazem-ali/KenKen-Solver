@@ -232,7 +232,7 @@ class Ui_MainWindow(object):
         MainWindow.setAcceptDrops(False)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(
-            "d:\\Hazem\\Coding\\KenKen GUI\\Ui Files\\../static/moftyIcon.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            "./static/moftyIcon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
