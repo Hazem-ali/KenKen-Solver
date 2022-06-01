@@ -1,4 +1,5 @@
 
+from typing import List, Tuple, Dict, Union, Callable
 import csp
 
 # @ <component>: <usage>
@@ -18,6 +19,8 @@ from functools import reduce
 # @ random, shuffle, randint, choice: generate a random kenken puzzle
 from random import seed, random, shuffle, randint, choice
 
+ELEMENT_TYPE:type = int or str
+CELL_TYPE:type = Tuple[ELEMENT_TYPE, ELEMENT_TYPE]
 def operation(operator):
     """
     A utility function used in order to determine the operation corresponding
@@ -426,8 +429,18 @@ class Kenken(csp.CSP):
 
 def solve(
     size:int,
-    cellAssignments,
-    algorithm:str):
+    cellAssignments:List[Tuple[Union[CELL_TYPE], str,ELEMENT_TYPE]],
+    algorithm:str)->\
+        Dict[Tuple[Union[CELL_TYPE]:ELEMENT_TYPE]] or None:
+    """
+        Solve the Kenken puzzle with the given size and cell assignments
+        using the given algorithm
+
+        Args:
+            size: the size of the puzzle
+            cellAssignments: a list of cell assignments
+            algorithm: the algorithm to use
+    """
     ken = Kenken(size, cellAssignments)
     if algorithm == "Backtracking":
         return csp.backtracking_search(ken)
