@@ -1,4 +1,4 @@
-
+"KenKen.py"
 from typing import List, Tuple, Dict, Union, Callable, Optional
 import csp
 
@@ -431,7 +431,7 @@ def solve(
     size:int,
     cellAssignments:List[Tuple[Union[CELL_TYPE], str,ELEMENT_TYPE]],
     algorithm:str)->\
-        Dict[Tuple[Union[CELL_TYPE]:ELEMENT_TYPE]] or None:
+        Dict[Tuple[Union[CELL_TYPE]],ELEMENT_TYPE] or None:
     """
         Solve the Kenken puzzle with the given size and cell assignments
         using the given algorithm
