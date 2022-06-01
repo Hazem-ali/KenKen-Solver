@@ -18,12 +18,6 @@ from functools import reduce
 # @ random, shuffle, randint, choice: generate a random kenken puzzle
 from random import seed, random, shuffle, randint, choice
 
-# @ time: benchmarking
-from time import time
-
-# @ writer: output benchmarking data in a csv format
-from csv import writer
-
 def operation(operator):
     """
     A utility function used in order to determine the operation corresponding
@@ -430,71 +424,15 @@ class Kenken(csp.CSP):
         for var in self.variables:
             print("neighbors[", var, "] =", self.neighbors[var])
 
-def benchmark(kenken, algorithm):
-        """
-        Used in order to benchmark the given algorithm in terms of
-          * The number of nodes it visits
-          * The number of constraint checks it performs
-          * The number of assignments it performs
-          * The completion time
-        """
-        kenken.checks = kenken.nassigns = 0
-
-        dt = time()
-
-        assignment = algorithm(kenken)
-
-        dt = time() - dt
-
-        return assignment, (kenken.checks, kenken.nassigns, dt)
-
-def gather(iterations, out):
-    """
-    Benchmark each one of the following algorithms for various kenken puzzles
-
-      * For every one of the following algorithms
-       * For every possible size of a kenken board
-         * Create 'iterations' random kenken puzzles of the current size
-           and evaluate the algorithm on each one of them in order to get
-           statistically sound data. Then calculate the average evaluation
-           of the algorithm for the current size.
-
-      * Save the results into a csv file
-    """
-    bt         = lambda ken: csp.backtracking_search(ken)
-    bt_mrv     = lambda ken: csp.backtracking_search(ken, select_unassigned_variable=csp.mrv)
-    fc         = lambda ken: csp.backtracking_search(ken, inference=csp.forward_checking)
-    fc_mrv     = lambda ken: csp.backtracking_search(ken, inference=csp.forward_checking, select_unassigned_variable=csp.mrv)
-    mac        = lambda ken: csp.backtracking_search(ken, inference=csp.mac)
-    mconflicts = lambda ken: csp.min_conflicts(ken)
-
-    algorithms = {
-        "BT": bt,
-        "BT+MRV": bt_mrv,
-        "FC": fc,
-        "FC+MRV": fc_mrv,
-        "MAC": mac,
-        "MIN_CONFLICTS": mconflicts
-    }
-
-    with open(out, "w+") as file:
-
-        out = writer(file)
-
-        out.writerow(["Algorithm", "Size", "Result", "Constraint checks", "Assignments", "Completion time"])
-
-        for name, algorithm in algorithms.items():
-            for size in range(3, 10):
-                checks, assignments, dt = (0, 0, 0)
-                for iteration in range(1, iterations + 1):
-                    size, cliques = generate(size)
-
-                    assignment, data = benchmark(Kenken(size, cliques), algorithm)
-
-                    print("algorithm =",  name, "size =", size, "iteration =", iteration, "result =", "Success" if assignment else "Failure", file=stderr)
-
-                    checks      += data[0] / iterations
-                    assignments += data[1] / iterations
-                    dt          += data[2] / iterations
-                    
-                out.writerow([name, size, checks, assignments, dt])
+def solve(
+    size:int,
+    cellAssignments,
+    algorithm:str):
+    ken = Kenken(size, cellAssignments)
+    if algorithm == "Backtracking":
+        return csp.backtracking_search(ken)
+    if algorithm == "Forward Checking":
+        return csp.backtracking_search(ken, inference=csp.forward_checking)
+    if algorithm == "Arc Consistency":
+        return csp.backtracking_search(ken, inference=csp.mac)
+    return None
