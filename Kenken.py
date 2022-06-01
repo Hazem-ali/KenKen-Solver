@@ -449,3 +449,77 @@ def solve(
     if algorithm == "Arc Consistency":
         return csp.backtracking_search(ken, inference=csp.mac)
     return None
+
+import numpy as np
+import pandas as pd
+import time
+import pickle
+def stats(iterations:int=50, **kargs):
+    """
+    Print the average results of the algorithms for various kenken puzzles
+    """
+    # algos
+    bt = lambda ken: csp.backtracking_search(ken)
+    fc = lambda ken: csp.backtracking_search(ken, inference=csp.forward_checking)
+    mac = lambda ken: csp.backtracking_search(ken, inference=csp.mac)
+
+    # genration
+    def generate_board(
+        size:int):
+        """
+        Generate a random kenken puzzle of the given size
+        """
+        _, cellAssignments = generate(size)
+        ken  = Kenken(size, cellAssignments)
+        return ken
+
+    def algo_benchmark(
+        algo:Callable[Kenken,Callable],
+        kenken:Kenken,):
+        t1 = time.perf_counter()
+        algo(kenken)
+        return time.perf_counter() - t1
+
+    def multi_algo_benchmark(
+        size:int,
+        kenken:Kenken)->Tuple[float,float,float]:
+
+        t1 = time.perf_counter()
+        bt(kenken)
+        bt_t = time.perf_counter() - t1
+
+        t1 = time.perf_counter()
+        fc(kenken)
+        fc_t = time.perf_counter() - t1
+
+        t1 = time.perf_counter()
+        mac(kenken)
+        mac_t = time.perf_counter() - t1
+
+        return [bt_t, fc_t, mac_t]
+
+
+    # generate 10 boards
+    iteration = iterations//10
+    # iteration = 4
+    start = 2
+
+    boards_df = pd.DataFrame()
+    for size in range(start, iteration+start):
+        boards_df[size-start] = list(map(lambda x: generate_board(size), range(iteration)))
+    print("generated")
+
+    # solve
+    results_df = pd.DataFrame()
+    for size in range(iteration):
+        print("solving size",size)
+        y= np.array(
+            list
+            (map(
+                lambda ken: np.array(
+                        multi_algo_benchmark(size, ken)),
+                    boards_df[size].to_list()
+                )
+            ))
+        results_df[size] = y.mean(axis=0)
+    results_df.to_csv("stats.csv",index=0)
