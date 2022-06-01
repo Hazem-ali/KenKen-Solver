@@ -184,7 +184,7 @@ class Board:
 
                 # adding law text
                 if index == 0:
-                    self.addText(law, 15, (Y + 20, X + 10))
+                    self.addText(law, 15, (Y + 25, X + 15))
 
             color_index += 1
 

@@ -6,7 +6,7 @@ def Generate_Random_Colors(num_colors, color_type='rgb'):
     # transparency = 150  # alpha: 150 is 50% transparent
 
     hex_colors = ["#"+''.join
-                  ([random.choice('23456789ABCDEF')for _ in range(6)])
+                  ([random.choice('3456789ABCDEF')for _ in range(6)])
                   for _ in range(num_colors)]
 
     rgb_colors = [(int(hex_colors[i][1:3], 16),

@@ -13,7 +13,7 @@ from typing import List, Tuple, Optional, Dict, Set
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle as theme
 from board import Board
-from kenken import generate, solve
+from Kenken import generate, solve
 import helpers
 
 # Theme Constants
