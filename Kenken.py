@@ -1,5 +1,5 @@
 
-from typing import List, Tuple, Dict, Union, Callable
+from typing import List, Tuple, Dict, Union, Callable, Optional
 import csp
 
 # @ <component>: <usage>
@@ -454,9 +454,31 @@ import numpy as np
 import pandas as pd
 import time
 import pickle
+def rename_axis(
+    df:pd.DataFrame,
+    col_accum:int=2,
+    algos:Optional[List[str]]= ["BT","FC","ARC"])->pd.DataFrame:
+    """
+        Rename the rows of a dataframe to the algos
+        and add the column accum
+
+        Args:
+            df: the dataframe to rename
+            col_accum: the column accum to add
+            algos: the algos names to use
+        
+        Returns:
+            the renamed dataframe
+    """
+    df.rename(columns=lambda x: int(x)+col_accum,inplace=True)
+    df = df.T.rename(columns=lambda x: algos[x]).T
+    return df
 def stats(iterations:int=50, **kargs):
     """
-    Print the average results of the algorithms for various kenken puzzles
+        Print the average results of the algorithms for various kenken puzzles
+
+        Args:
+            iterations: the number of iterations to average over
     """
     # algos
     bt = lambda ken: csp.backtracking_search(ken)
@@ -522,4 +544,6 @@ def stats(iterations:int=50, **kargs):
                 )
             ))
         results_df[size] = y.mean(axis=0)
+    # rename
+    results_df = rename_axis(results_df, col_accum=2)
     results_df.to_csv("stats.csv",index=0)
