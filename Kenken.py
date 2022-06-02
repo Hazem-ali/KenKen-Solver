@@ -26,7 +26,7 @@ from random import seed, random, shuffle, randint, choice
 ELEMENT_TYPE: type = int or str
 CELL_TYPE: type = Tuple[ELEMENT_TYPE, ELEMENT_TYPE]
 
-
+ALGORITHMS = ["BT", "FC", "ARC"]
 def operation(operator):
     """
     A utility function used in order to determine the operation corresponding
@@ -457,7 +457,6 @@ class Kenken(csp.CSP):
         for var in self.variables:
             print("neighbors[", var, "] =", self.neighbors[var])
 
-
 def solve(
     size: int,
     cellAssignments: List[Tuple[Union[CELL_TYPE], str, ELEMENT_TYPE]],
@@ -485,7 +484,7 @@ def solve(
 def rename_axis(
         df: pd.DataFrame,
         col_accum: int = 2,
-        algos: Optional[List[str]] = ["BT", "FC", "ARC"]) -> pd.DataFrame:
+        algos: Optional[List[str]] = None) -> pd.DataFrame:
     """
         Rename the rows of a dataframe to the algos
         and add the column accum
@@ -498,12 +497,15 @@ def rename_axis(
         Returns:
             the renamed dataframe
     """
+    if algos is None:
+        algos = ALGORITHMS
     df.rename(columns=lambda x: int(x)+col_accum, inplace=True)
     df = df.T.rename(columns=lambda x: algos[x]).T
     return df
 def stats(
     iterations:int=50,
-    start_size:int = 3,**kargs):
+    start_size:int = 3,
+    size_iteration:int = 10,**kargs):
     """
         get the average results of the algorithms for various kenken puzzles
         and save them in a csv file
@@ -540,7 +542,6 @@ def stats(
         return time.perf_counter() - t1
 
     def multi_algo_benchmark(
-            size: int,
             kenken: Kenken) -> Tuple[float, float, float]:
 
         t1 = time.perf_counter()
@@ -557,26 +558,22 @@ def stats(
 
         return [bt_t, fc_t, mac_t]
 
-    # generate 10 boards
-    iteration = iterations//16
-    # iteration = 4
-
+    # generate boards
     boards_df = pd.DataFrame()
-    for size in range(start_size, iteration+start_size):
-        boards_df[size-start_size] = list(map(lambda x: generate_board(size), range(iteration)))
+    for size in range(start_size, iterations//size_iteration+start_size):
+        boards_df[size-start_size] = list(map(lambda x: generate_board(size), range(size_iteration)))
+        print("generated for size", size)
+
     print("generated")
 
     # solve
     results_df = pd.DataFrame()
-    for size in range(iteration):
+    for size in range(iterations//size_iteration):
         print("Solving size", size+start_size)
-        y = np.array(
-            list
-            (map(
+        y = np.array(list(map(
                 lambda ken: np.array(
-                    multi_algo_benchmark(size, ken)),
-                boards_df[size].to_list()
-            )
+                    multi_algo_benchmark(ken)),
+                boards_df[size].to_list())
             ))
         results_df[size] = y.mean(axis=0)
     # rename
@@ -584,4 +581,4 @@ def stats(
     # create algorithm column in the beginning
     results_df.insert(
         0, " ", ["Backtracking", "Forward Checking", "Arc Consistency"])
-    results_df.to_csv("Statistics.csv", index=0)
+    results_df.to_csv("s.csv", index=0)
