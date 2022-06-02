@@ -1,8 +1,8 @@
+"KenKen.py"
 import numpy as np
 import pickle
 import time
 import pandas as pd
-"KenKen.py"
 from typing import List, Tuple, Dict, Union, Callable, Optional
 import csp
 
@@ -460,7 +460,7 @@ class Kenken(csp.CSP):
 def solve(
     size: int,
     cellAssignments: List[Tuple[Union[CELL_TYPE], str, ELEMENT_TYPE]],
-    algorithm: str) ->\
+    algorithm: str,) ->\
         Dict[Tuple[Union[CELL_TYPE]], ELEMENT_TYPE] or None:
     """
         Solve the Kenken puzzle with the given size and cell assignments
@@ -505,7 +505,8 @@ def rename_axis(
 def stats(
     iterations:int=50,
     start_size:int = 3,
-    size_iteration:int = 10,**kargs):
+    size_iteration:int = 10,
+    out_path = "Statistics.csv",**kargs):
     """
         get the average results of the algorithms for various kenken puzzles
         and save them in a csv file
@@ -581,4 +582,4 @@ def stats(
     # create algorithm column in the beginning
     results_df.insert(
         0, " ", ["Backtracking", "Forward Checking", "Arc Consistency"])
-    results_df.to_csv("s.csv", index=0)
+    results_df.to_csv(out_path, index=0)
