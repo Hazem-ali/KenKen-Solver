@@ -1,3 +1,7 @@
+import numpy as np
+import pickle
+import time
+import pandas as pd
 "KenKen.py"
 from typing import List, Tuple, Dict, Union, Callable, Optional
 import csp
@@ -19,8 +23,10 @@ from functools import reduce
 # @ random, shuffle, randint, choice: generate a random kenken puzzle
 from random import seed, random, shuffle, randint, choice
 
-ELEMENT_TYPE:type = int or str
-CELL_TYPE:type = Tuple[ELEMENT_TYPE, ELEMENT_TYPE]
+ELEMENT_TYPE: type = int or str
+CELL_TYPE: type = Tuple[ELEMENT_TYPE, ELEMENT_TYPE]
+
+
 def operation(operator):
     """
     A utility function used in order to determine the operation corresponding
@@ -37,6 +43,7 @@ def operation(operator):
     else:
         return None
 
+
 def adjacent(xy1, xy2):
     """
     Checks wheither two positions represented in 2D coordinates are adjacent
@@ -47,6 +54,7 @@ def adjacent(xy1, xy2):
     dx, dy = x1 - x2, y1 - y2
 
     return (dx == 0 and abs(dy) == 1) or (dy == 0 and abs(dx) == 1)
+
 
 def generate(size):
     """
@@ -90,7 +98,8 @@ def generate(size):
                 for r in range(size):
                     board[r][c1], board[r][c2] = board[r][c2], board[r][c1]
 
-    board = {(j + 1, i + 1): board[i][j] for i in range(size) for j in range(size)}
+    board = {(j + 1, i + 1): board[i][j]
+             for i in range(size) for j in range(size)}
 
     uncaged = sorted(board.keys(), key=lambda var: var[1])
 
@@ -117,9 +126,9 @@ def generate(size):
                 break
 
             uncaged.remove(cell)
-            
+
             cliques[-1].append(cell)
-            
+
         csize = len(cliques[-1])
         if csize == 1:
             cell = cliques[-1][0]
@@ -128,17 +137,19 @@ def generate(size):
         elif csize == 2:
             fst, snd = cliques[-1][0], cliques[-1][1]
             if board[fst] / board[snd] > 0 and not board[fst] % board[snd]:
-                operator = "/" # choice("+-*/")
+                operator = "/"  # choice("+-*/")
             else:
-                operator = "-" # choice("+-*")
+                operator = "-"  # choice("+-*")
         else:
             operator = choice("+*")
 
-        target = reduce(operation(operator), [board[cell] for cell in cliques[-1]])
+        target = reduce(operation(operator), [
+                        board[cell] for cell in cliques[-1]])
 
         cliques[-1] = (tuple(cliques[-1]), operator, int(target))
 
     return size, cliques
+
 
 def parse(lines):
     """
@@ -169,6 +180,7 @@ def parse(lines):
 
     return size, cliques
 
+
 def validate(size, cliques):
     """
     Validate the integrity of the input as a kenken board
@@ -179,7 +191,8 @@ def validate(size, cliques):
         * Check if any member of the clique is mentioned in any other clique
       * Check if the given cliques cover the whole board or not
     """
-    outOfBounds = lambda xy: xy[0] < 1 or xy[0] > size or xy[1] < 1 or xy[1] > size
+    def outOfBounds(
+        xy): return xy[0] < 1 or xy[0] > size or xy[1] < 1 or xy[1] > size
 
     mentioned = set()
     for i in range(len(cliques)):
@@ -190,28 +203,34 @@ def validate(size, cliques):
         members, operator, target = cliques[i]
 
         if operator not in "+-*/.":
-            print("Operation", operator, "of clique", cliques[i], "is unacceptable", file=stderr)
+            print("Operation", operator, "of clique",
+                  cliques[i], "is unacceptable", file=stderr)
             exit(1)
 
         problematic = list(filter(outOfBounds, members))
         if problematic:
-            print("Members", problematic, "of clique", cliques[i], "are out of bounds", file=stderr)
+            print("Members", problematic, "of clique",
+                  cliques[i], "are out of bounds", file=stderr)
             exit(2)
 
         problematic = mentioned.intersection(set(members))
         if problematic:
-            print("Members", problematic, "of clique", cliques[i], "are cross referenced", file=stderr)
+            print("Members", problematic, "of clique",
+                  cliques[i], "are cross referenced", file=stderr)
             exit(3)
 
         mentioned.update(set(members))
 
     indexes = range(1, size + 1)
 
-    problematic = set([(x, y) for y in indexes for x in indexes]).difference(mentioned)
+    problematic = set([(x, y)
+                      for y in indexes for x in indexes]).difference(mentioned)
 
     if problematic:
-        print("Positions", problematic, "were not mentioned in any clique", file=stderr)
+        print("Positions", problematic,
+              "were not mentioned in any clique", file=stderr)
         exit(4)
+
 
 def RowXorCol(xy1, xy2):
     """
@@ -219,6 +238,7 @@ def RowXorCol(xy1, xy2):
     but are in different columns / rows
     """
     return (xy1[0] == xy2[0]) != (xy1[1] == xy2[1])
+
 
 def conflicting(A, a, B, b):
     """
@@ -241,6 +261,7 @@ def conflicting(A, a, B, b):
 
     return False
 
+
 def satisfies(values, operation, target):
     """
     Evaluates to true if the result of applying the operation
@@ -251,6 +272,7 @@ def satisfies(values, operation, target):
             return True
 
     return False
+
 
 def gdomains(size, cliques):
     """
@@ -274,14 +296,16 @@ def gdomains(size, cliques):
     for clique in cliques:
         members, operator, target = clique
 
-        domains[members] = list(product(range(1, size + 1), repeat=len(members)))
+        domains[members] = list(
+            product(range(1, size + 1), repeat=len(members)))
 
-        qualifies = lambda values: not conflicting(members, values, members, values) and satisfies(values, operation(operator), target)
+        def qualifies(values): return not conflicting(
+            members, values, members, values) and satisfies(values, operation(operator), target)
 
         domains[members] = list(filter(qualifies, domains[members]))
-        
-        
+
     return domains
+
 
 def gneighbors(cliques):
     """
@@ -303,6 +327,8 @@ def gneighbors(cliques):
                     neighbors[B].append(A)
 
     return neighbors
+
+
 class Kenken(csp.CSP):
 
     def __init__(self, size, cliques):
@@ -316,9 +342,9 @@ class Kenken(csp.CSP):
               when applied on the members of the clique
         """
         validate(size, cliques)
-        
+
         variables = [members for members, _, _ in cliques]
-        
+
         domains = gdomains(size, cliques)
 
         neighbors = gneighbors(cliques)
@@ -336,7 +362,7 @@ class Kenken(csp.CSP):
         self.meta = {}
         for members, operator, target in cliques:
             self.meta[members] = (operator, target)
-            self.padding = max(self.padding, len(str(target)))        
+            self.padding = max(self.padding, len(str(target)))
 
     # def nconflicts(self, var, val, assignment):
 
@@ -371,13 +397,15 @@ class Kenken(csp.CSP):
                     for member in members:
                         atomic[member] = None
         else:
-            atomic = {member:None for members in self.variables for member in members}
+            atomic = {
+                member: None for members in self.variables for member in members}
 
-        atomic = sorted(atomic.items(), key=lambda item: item[0][1] * self.size + item[0][0])
+        atomic = sorted(
+            atomic.items(), key=lambda item: item[0][1] * self.size + item[0][0])
 
-        padding = lambda c, offset: (c * (self.padding + 2 - offset))
+        def padding(c, offset): return (c * (self.padding + 2 - offset))
 
-        embrace = lambda inner, beg, end: beg + inner + end
+        def embrace(inner, beg, end): return beg + inner + end
 
         mentioned = set()
 
@@ -389,15 +417,17 @@ class Kenken(csp.CSP):
 
             return ""
 
-        fit = lambda word: padding(" ", len(word)) + word + padding(" ", 0)
+        def fit(word): return padding(" ", len(word)) + word + padding(" ", 0)
 
         cpadding = embrace(2 * padding(" ", 0), "|", "") * self.size + "|"
 
         def show(row):
 
-            rpadding = "".join(["|" + fit(meta(item[0])) for item in row]) + "|"
+            rpadding = "".join(["|" + fit(meta(item[0]))
+                               for item in row]) + "|"
 
-            data = "".join(["|" + fit(str(item[1] if item[1] else "")) for item in row]) + "|"
+            data = "".join(["|" + fit(str(item[1] if item[1] else ""))
+                           for item in row]) + "|"
 
             print(rpadding, data, cpadding, sep="\n")
 
@@ -427,11 +457,12 @@ class Kenken(csp.CSP):
         for var in self.variables:
             print("neighbors[", var, "] =", self.neighbors[var])
 
+
 def solve(
-    size:int,
-    cellAssignments:List[Tuple[Union[CELL_TYPE], str,ELEMENT_TYPE]],
-    algorithm:str)->\
-        Dict[Tuple[Union[CELL_TYPE]],ELEMENT_TYPE] or None:
+    size: int,
+    cellAssignments: List[Tuple[Union[CELL_TYPE], str, ELEMENT_TYPE]],
+    algorithm: str) ->\
+        Dict[Tuple[Union[CELL_TYPE]], ELEMENT_TYPE] or None:
     """
         Solve the Kenken puzzle with the given size and cell assignments
         using the given algorithm
@@ -450,14 +481,11 @@ def solve(
         return csp.backtracking_search(ken, inference=csp.mac)
     return None
 
-import numpy as np
-import pandas as pd
-import time
-import pickle
+
 def rename_axis(
-    df:pd.DataFrame,
-    col_accum:int=2,
-    algos:Optional[List[str]]= ["BT","FC","ARC"])->pd.DataFrame:
+        df: pd.DataFrame,
+        col_accum: int = 2,
+        algos: Optional[List[str]] = ["BT", "FC", "ARC"]) -> pd.DataFrame:
     """
         Rename the rows of a dataframe to the algos
         and add the column accum
@@ -466,11 +494,11 @@ def rename_axis(
             df: the dataframe to rename
             col_accum: the column accum to add
             algos: the algos names to use
-        
+
         Returns:
             the renamed dataframe
     """
-    df.rename(columns=lambda x: int(x)+col_accum,inplace=True)
+    df.rename(columns=lambda x: int(x)+col_accum, inplace=True)
     df = df.T.rename(columns=lambda x: algos[x]).T
     return df
 def stats(
@@ -485,13 +513,15 @@ def stats(
             start_size: the size of the first kenken puzzle
     """
     # algos
-    bt = lambda ken: csp.backtracking_search(ken)
-    fc = lambda ken: csp.backtracking_search(ken, inference=csp.forward_checking)
-    mac = lambda ken: csp.backtracking_search(ken, inference=csp.mac)
+    def bt(ken): return csp.backtracking_search(ken)
+    def fc(ken): return csp.backtracking_search(
+        ken, inference=csp.forward_checking)
+
+    def mac(ken): return csp.backtracking_search(ken, inference=csp.mac)
 
     # genration
     def generate_board(
-        size:int):
+            size: int):
         """
         Generate a random kenken puzzle of the given size
 
@@ -499,19 +529,19 @@ def stats(
             size: the size of the puzzle
         """
         _, cellAssignments = generate(size)
-        ken  = Kenken(size, cellAssignments)
+        ken = Kenken(size, cellAssignments)
         return ken
 
     def algo_benchmark(
-        algo:Callable[Kenken,Callable],
-        kenken:Kenken,):
+            algo: Callable,
+            kenken: Kenken,):
         t1 = time.perf_counter()
         algo(kenken)
         return time.perf_counter() - t1
 
     def multi_algo_benchmark(
-        size:int,
-        kenken:Kenken)->Tuple[float,float,float]:
+            size: int,
+            kenken: Kenken) -> Tuple[float, float, float]:
 
         t1 = time.perf_counter()
         bt(kenken)
@@ -527,9 +557,8 @@ def stats(
 
         return [bt_t, fc_t, mac_t]
 
-
     # generate 10 boards
-    iteration = iterations//10
+    iteration = iterations//16
     # iteration = 4
 
     boards_df = pd.DataFrame()
@@ -540,16 +569,19 @@ def stats(
     # solve
     results_df = pd.DataFrame()
     for size in range(iteration):
-        print("solving size",size)
-        y= np.array(
+        print("Solving size", size+start_size)
+        y = np.array(
             list
             (map(
                 lambda ken: np.array(
-                        multi_algo_benchmark(size, ken)),
-                    boards_df[size].to_list()
-                )
+                    multi_algo_benchmark(size, ken)),
+                boards_df[size].to_list()
+            )
             ))
         results_df[size] = y.mean(axis=0)
     # rename
     results_df = rename_axis(results_df, col_accum=start_size)
-    results_df.to_csv("stats.csv",index=0)
+    # create algorithm column in the beginning
+    results_df.insert(
+        0, " ", ["Backtracking", "Forward Checking", "Arc Consistency"])
+    results_df.to_csv("Statistics.csv", index=0)
