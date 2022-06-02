@@ -473,12 +473,16 @@ def rename_axis(
     df.rename(columns=lambda x: int(x)+col_accum,inplace=True)
     df = df.T.rename(columns=lambda x: algos[x]).T
     return df
-def stats(iterations:int=50, **kargs):
+def stats(
+    iterations:int=50,
+    start_size:int = 3,**kargs):
     """
-        Print the average results of the algorithms for various kenken puzzles
+        get the average results of the algorithms for various kenken puzzles
+        and save them in a csv file
 
         Args:
             iterations: the number of iterations to average over
+            start_size: the size of the first kenken puzzle
     """
     # algos
     bt = lambda ken: csp.backtracking_search(ken)
@@ -490,6 +494,9 @@ def stats(iterations:int=50, **kargs):
         size:int):
         """
         Generate a random kenken puzzle of the given size
+
+        Args:
+            size: the size of the puzzle
         """
         _, cellAssignments = generate(size)
         ken  = Kenken(size, cellAssignments)
@@ -524,11 +531,10 @@ def stats(iterations:int=50, **kargs):
     # generate 10 boards
     iteration = iterations//10
     # iteration = 4
-    start = 2
 
     boards_df = pd.DataFrame()
-    for size in range(start, iteration+start):
-        boards_df[size-start] = list(map(lambda x: generate_board(size), range(iteration)))
+    for size in range(start_size, iteration+start_size):
+        boards_df[size-start_size] = list(map(lambda x: generate_board(size), range(iteration)))
     print("generated")
 
     # solve
@@ -545,5 +551,5 @@ def stats(iterations:int=50, **kargs):
             ))
         results_df[size] = y.mean(axis=0)
     # rename
-    results_df = rename_axis(results_df, col_accum=2)
+    results_df = rename_axis(results_df, col_accum=start_size)
     results_df.to_csv("stats.csv",index=0)
